@@ -46,21 +46,21 @@ err = immse (H, H_approx)
 %% PLOT
 
 % Altitude data
-% figure
-% mesh(X,Y,H)
-% xlabel('x[mm]')
-% ylabel('y[mm]')
-% zlabel('h[mm]')
-% zlim([-50 40])
+figure
+mesh(X,Y,H)
+xlabel('x[mm]')
+ylabel('y[mm]')
+zlabel('h[mm]')
+zlim([-50 40])
 % saveas(gcf,'origin.png')
-% 
-% % Noisy data
-% figure
-% mesh(X,Y,H_est)
-% xlabel('x[mm]')
-% ylabel('y[mm]')
-% zlabel('h[mm]')
-% zlim([-50 40])
+
+% Noisy data
+figure
+mesh(X,Y,H_est)
+xlabel('x[mm]')
+ylabel('y[mm]')
+zlabel('h[mm]')
+zlim([-50 40])
 % saveas(gcf,'noisy.png')
 
 % Approximated data
