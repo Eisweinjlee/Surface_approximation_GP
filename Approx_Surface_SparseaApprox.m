@@ -54,7 +54,7 @@ toc
 %% Sparse approximation
 
 % inducing points
-xu = X_test(1:4:end,:); cov = {'apxSparse', covfunc, xu};
+xu = X_test(1:10:end,:); cov = {'apxSparse', covfunc, xu};
 inff = @(varargin) infmethod(varargin{:},struct('s',1.0));  
 % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
 
