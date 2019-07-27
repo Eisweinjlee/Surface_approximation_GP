@@ -22,8 +22,10 @@ x = X(:);
 y = Y(:);
 h = H_est(:);
 
+tic
 f = fit([x,y],h,'poly55');
 % plot(f,[x,y],h)
+toc
 
 %% The approximate model
 H_approx = f(X,Y);

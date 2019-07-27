@@ -16,7 +16,7 @@ s = 5;  % variance
 H_est = H + s * randn(m,n);   % Gaussian noise
 
 %% The dataset
-% simply reduce to 1/4 data, by jump 2 steps
+% induce the data with step k, obtain 1/k^2 of data
 [X_data, Y_data] = datasetReduction(X, Y, H_est);
 X_test = [X(:), Y(:)];
 
@@ -31,7 +31,7 @@ hyp = struct('mean', [], 'cov', [0 0 0], 'lik', -1);
 
 tic
 % Optimization
-hyp2 = minimize(hyp, @gp, -100, @infGaussLik, meanfunc, covfunc,...
+hyp2 = minimize(hyp, @gp, -200, @infGaussLik, meanfunc, covfunc,...
     likfunc, X_data, Y_data);
 toc
 
