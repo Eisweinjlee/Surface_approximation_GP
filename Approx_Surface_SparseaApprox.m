@@ -53,7 +53,7 @@ hyp_init = struct('mean', [], 'cov', [0 0 0], 'lik', -1);
 %% Sparse approximation
 
 % inducing points
-xu = X_test(1::end,:); cov = {'apxSparse', covfunc, xu};
+xu = X_test(1:8:end,:); cov = {'apxSparse', covfunc, xu};
 inff = @(varargin) infmethod(varargin{:},struct('s',0.0));  
 % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
 
