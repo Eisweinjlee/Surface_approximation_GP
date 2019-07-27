@@ -25,3 +25,10 @@ Rasmussen C E. Gaussian processes in machine learning[C]//Summer School on Machi
 Burt D R, Rasmussen C E, Van Der Wilk M. Rates of Convergence for Sparse Variational Gaussian Process Regression[J]. arXiv preprint arXiv:1903.03571, 2019.
 
 Titsias M. Variational learning of inducing variables in sparse Gaussian processes[C]//Artificial Intelligence and Statistics. 2009: 567-574.
+
+### The Regression of Noisy Surface Data
+
+<p float="left">
+<img width="350" src=https://user-images.githubusercontent.com/26374671/61990819-6815b180-b082-11e9-93e7-20d8b26ffc7a.png alt="Noisy data" />
+<img width="350" src=https://user-images.githubusercontent.com/26374671/61990831-95625f80-b082-11e9-93e5-d926ea108323.png alt="Original data" />
+</p>
