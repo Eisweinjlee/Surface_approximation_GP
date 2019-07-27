@@ -5,7 +5,7 @@ function [X_data, Y_data] = datasetReduction(X, Y, H)
 
 m = length(H(:,1));
 n = length(H(1,:));
-steps = 3;  % step length of reduction
+steps = 2;  % step length of reduction
 
 x = X(1:steps:m,1:steps:n);
 y = Y(1:steps:m,1:steps:n);

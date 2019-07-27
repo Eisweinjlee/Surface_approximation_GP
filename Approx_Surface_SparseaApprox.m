@@ -15,6 +15,7 @@ n = length(H(1,:));
 s = 5;  % variance
 H_est = H + s * randn(m,n);   % Gaussian noise
 
+
 %% The dataset
 % simply reduce to 1/4 data, by jump 2 steps
 
@@ -27,7 +28,9 @@ H_est = H + s * randn(m,n);   % Gaussian noise
 
 X_test = [X(:), Y(:)];
 
-%% Gaussian Process
+%% Gaussian ProcessÅA
+
+N = 100;  % iteration times limitation
 
 % Specify the mean, cov, likelihood
 meanfunc = [];                    % empty: don't use a mean function
@@ -37,35 +40,40 @@ infmethod = @infGaussLik;               % inference with Guassian Likelihood
 % The hyperparameter struct
 hyp_init = struct('mean', [], 'cov', [0 0 0], 'lik', -1);
 
-% Optimization hyperparameters
-tic
-hyp_full = minimize(hyp_init, @gp, -200, infmethod, meanfunc, covfunc,...
-    likfunc, X_data, Y_data);
-toc
-
-% The dense prediction
-[mu, s2] = gp(hyp_full, infmethod, meanfunc, covfunc, likfunc,...
-    X_data, Y_data, X_test);  % Xtrain,Ytrain,Xtest
-
-% % Marginal likelihood and derivatives
-% [nlZ,dnlZ] = gp(hyp_full,infmethod, meanfunc, covfunc,...
+% % Optimization hyperparameters
+% tic
+% hyp_full = minimize(hyp_init, @gp, -N, infmethod, meanfunc, covfunc,...
 %     likfunc, X_data, Y_data);
+% toc
+% 
+% % The dense prediction
+% [mu, s2] = gp(hyp_full, infmethod, meanfunc, covfunc, likfunc,...
+%     X_data, Y_data, X_test);  % Xtrain,Ytrain,Xtest
 
 %% Sparse approximation
 
 % inducing points
-xu = X_test(1:10:end,:); cov = {'apxSparse', covfunc, xu};
-inff = @(varargin) infmethod(varargin{:},struct('s',1.0));  
+xu = X_test(1::end,:); cov = {'apxSparse', covfunc, xu};
+inff = @(varargin) infmethod(varargin{:},struct('s',0.0));  
 % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
 
 tic
-[ymu,ys2] = gp(hyp_full, inff, meanfunc, cov, likfunc,...
-    X_data, Y_data, X_test);
+hyp_init.xu = xu;
+hyp = minimize(hyp_init, @gp, -200, inff, meanfunc, cov, likfunc,...
+    X_data, Y_data);
 toc
 
+[ymu,ys2] = gp(hyp, inff, meanfunc, cov, likfunc,...
+    X_data, Y_data, X_test);
+
+% Marginal likelihood and derivatives
+[nlZ,dnlZ] = gp(hyp,infmethod, meanfunc, cov,...
+    likfunc, X_data, Y_data)
+
+
 %% Approximation result
-H_approx = reshape(mu,[m,n]);
-err1 = immse (H, H_approx)
+% % H_approx = reshape(mu,[m,n]);
+% err1 = immse (H, H_approx)
 
 H_sparse = reshape(ymu,[m,n]);
 err2 = immse (H, H_sparse)
@@ -91,14 +99,14 @@ err2 = immse (H, H_sparse)
 % zlim([-50 40])
 % % saveas(gcf,'noisy.png')
 
-% Approximated data
-figure
-mesh(X,Y,H_approx)
-xlabel('x[mm]')
-ylabel('y[mm]')
-zlabel('h[mm]')
-zlim([-50 40])
-% saveas(gcf,'approx.png')
+% % Approximated data
+% figure
+% mesh(X,Y,H_approx)
+% xlabel('x[mm]')
+% ylabel('y[mm]')
+% zlabel('h[mm]')
+% zlim([-50 40])
+% % saveas(gcf,'approx.png')
 
 % Sparse approximated
 figure
