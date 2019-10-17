@@ -28,7 +28,7 @@ H_est = H + s * randn(m,n);   % Gaussian noise
 
 X_test = [X(:), Y(:)];
 
-%% Gaussian ProcessA
+%% Gaussian Process?A
 
 N = 100;  % iteration times limitation
 
