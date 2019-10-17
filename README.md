@@ -1,6 +1,6 @@
 # Surface_approximation_GP
 
-updated on July 27, 2019
+updated on October 17th, 2019
 
 ### The Matlab programs in this project
 
@@ -14,9 +14,11 @@ updated on July 27, 2019
 
 3. `Approx_Surface_GPR_datasetReduction.m` works with `datasetReduction.m`, which naively reduces the data by step.
 
+4. `Approx_Surface_SVGP.m` is going to implement the SVGP method [Titsias 2009].
+
 (On-going)
 
-1. `Approx_Surface_SparseaApprox.m` is going to implement the SVGP method [Titsias 2009] [Burt, et al 2019].
+5. Modeling for experiment data.
 
 ### References:
 
