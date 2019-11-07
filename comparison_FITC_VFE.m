@@ -1,4 +1,4 @@
-%% Comparison on FITC and VFE
+%% Comparison on FITC and VFE demo
 % LI Yang// Oct 22nd, 2019
 clear
 close all
@@ -64,7 +64,9 @@ if selection_flag == 2 % full GP regression
 elseif selection_flag == 0 || selection_flag == 1 % Sparse approximation
     
     % inducing points
-    xu = X_test(1:2:end); cov = {'apxSparse', covfunc, xu};
+    xu = X_test(45:55); % (1) bad choice of initial inducing set
+    % xu = X_test(1:2:end); % (2) generous choice of initial inducing set
+    cov = {'apxSparse', covfunc, xu};
     inff = @(varargin) infmethod(varargin{:},struct('s', selection_flag));
     % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
     
