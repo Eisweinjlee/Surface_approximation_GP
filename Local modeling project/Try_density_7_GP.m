@@ -6,11 +6,10 @@ clear
 
 %% load the dataset
 load local_sparse_7_data.mat
-% X_data, Y_data, X_test inside
+% X_data, Y_data, X_test inside for training
+% X_local, Y_local inside for plot
 
-% Grid information
-% X_local, Y_local inside
-[m,n] = size(X_local);
+[m,n] = size(X_local); % Grid information
 
 %% Gaussian Process
 

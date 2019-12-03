@@ -19,10 +19,12 @@ H_full = H; % Full dataset
 load C:\Users\LI\Desktop\Approx_Surface\Vessel_XY.mat
 
 Xc = 85; Yc = 0;
-lx = 40; ly = 40;
+
+ux = 80; uy = 60;   % upper bound
+lx = 40; ly = 60;   % lower bound
 
 % Get the area of local space
-X_range = [Xc - lx; Xc + lx]; Y_range = [Yc - ly; Yc + ly];
+X_range = [Xc - lx; Xc + ux]; Y_range = [Yc - ly; Yc + uy];
 Local_area = ones(m,n);
 % represent with logical value
 X_area = X(1,:)<X_range(1); X_area = X_area | X(1,:)>X_range(2);
@@ -90,7 +92,7 @@ plot([X_range(1),X_range(1)],[Y_range(1),Y_range(2)],'Color','[0, 0, 0]')
 plot([X_range(2),X_range(2)],[Y_range(1),Y_range(2)],'Color','[0, 0, 0]')
 
 %% 3. Make it sparse
-step_length = 9; % level of sparseness
+step_length = 8; % level of sparseness
 
 H_local_sparse = [];
 X_local_sparse = [];
