@@ -105,7 +105,7 @@ end
 % Because different data has different size of local area,
 % here let us make it sparse first.
 
-step_length = 9; % level of sparseness
+step_length = 15; % level of sparseness
 
 H_local_sparse = []; X_local_sparse = []; Y_local_sparse = [];
 
