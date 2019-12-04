@@ -19,7 +19,6 @@ H_data = zeros(m,n,61);
 
 % load others
 number = 0;
-
 for i = 1:9
     for j = 1:5
         number = number + 1;
@@ -28,7 +27,6 @@ for i = 1:9
         H_data(:,:,number) = dep - H0;
     end
 end
-
 for i = 1:16
     number = number + 1;
     filename = docName + num2str(100+i)+".mat";
@@ -65,7 +63,7 @@ end
 
 %% 4.1 Determine the local area for each data
 % Output:
-% AA(m,n,number) - the data from H_error, outside local area is all 0.
+% H_local(m,n,number) - the data from H_error, outside local area is all 0.
 % X_local(m,n,number) - the data of X, outside local area is all 0.
 % Y_local(m,n,number) - the data of Y, outside local area is all 0.
 
@@ -76,7 +74,7 @@ lx = 50; ly = 60;   % area lower bound to center
 % Get the area of local space
 X_range = [Xc.*170-lx, Xc.*170+ux]; Y_range = [Yc.*80-ly, Yc.*80+uy];
 Local_area = ones(m,n,number); % 1 and 0 meshgrid, 1 represents the local area
-AA = zeros(m,n,number); % The data of local area
+H_local = zeros(m,n,number); % The data of local area
 X_local = zeros(m,n,number);
 Y_local = zeros(m,n,number); % the meshgrid of position value for local area
 
@@ -101,34 +99,55 @@ for k = 1:number
     Y_local(:,:,k) = Local_area(:,:,k) .* Y;
     
     % extract the local data from data, not local => 0
-    AA(:,:,k) = Local_area(:,:,k) .* H_error(:,:,k);
+    H_local(:,:,k) = Local_area(:,:,k) .* H_error(:,:,k);
 end
 
-%% 4.2 Plot to check the local area
-num = 30; % the data number: 1~61
+%% 5. Make it sparse!
+% Because different data has different size of local area,
+% here let us make it sparse first.
 
-% Evaluation idea: plot AA to see whether your local area covers well!!
-figure; mesh(H_error(:,:,num));
-figure; mesh(AA(:,:,num));
+step_length = 9; % level of sparseness
+
+H_local_sparse = []; X_local_sparse = []; Y_local_sparse = [];
+
+ix = 1; jy = 1;
+for i = 1:step_length:m
+    for j = 1:step_length:n
+        H_local_sparse(ix,jy,:) = H_local(i,j,:);
+        X_local_sparse(ix,jy,:) = X_local(i,j,:);
+        Y_local_sparse(ix,jy,:) = Y_local(i,j,:);
+        jy = jy + 1;
+    end
+    ix = ix + 1;
+    jy = 1;
+end
+
+%% 6. Plot to check the local area and data
+num = 13; % the data number: 1~61
+
+% Evaluation: plot H_local to see whether your local area covers well!!
+figure; mesh(H_error(:,:,num)); figure; mesh(H_local(:,:,num));
 
 % Evaluation idea: Show the local area
-figure(88); hold on;
-title("Data No."+num+", the dataset point(red) and selected point(black)")
+figure; hold on;
+title("Data No." + num + ", the dataset point(red) and selected point(black)")
 
+% full data points
 plot(X,Y,'LineStyle','none','Marker','.','Color','[0.8500, 0.3250, 0.0980]')
+
+% soil loading center
 plot(Xc(num)*170,Yc(num)*80,'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.7)
 
+% local area bounds
 plot([X_range(num,1),X_range(num,2)],[Y_range(num,1),Y_range(num,1)],'Color','[0, 0, 0]')
 plot([X_range(num,1),X_range(num,2)],[Y_range(num,2),Y_range(num,2)],'Color','[0, 0, 0]')
 plot([X_range(num,1),X_range(num,1)],[Y_range(num,1),Y_range(num,2)],'Color','[0, 0, 0]')
 plot([X_range(num,2),X_range(num,2)],[Y_range(num,1),Y_range(num,2)],'Color','[0, 0, 0]')
 
+% selected data points
+plot(X_local_sparse(:,:,num),Y_local_sparse(:,:,num),'LineStyle','none','Marker','x','Color','[0, 0, 0]')
+hold off;
 
-%% 5. Pick out all the data
-% pick all the data points in the determined local area!
+%% 7. Make a dataset
+% pick up all the selected data points in the determined local area!
 % and also their relative positions.
-
-BB = AA;
-
-
-%% 6. Make it sparse!
