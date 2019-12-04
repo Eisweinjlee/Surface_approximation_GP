@@ -53,19 +53,82 @@ for i = 1:number
     delta_H = function_input_2d(X,Y,dep_center(i,:)',2.96*Vol(i),Sigma,the,xf,yr,yl);
     H_error(:,:,i) = H_data(:,:,i) - delta_H;   % error data
     
-%     close all % test use (study about the error distribution!)
-%     figure
-%     mesh(delta_H)
-%     title("Gaussian pdf")
-%     figure
-%     mesh(H_error(:,:,i))
-%     title("Error Model")
+    %     close all % test use (study about the error distribution!)
+    %     figure
+    %     mesh(delta_H)
+    %     title("Gaussian pdf")
+    %     figure
+    %     mesh(H_error(:,:,i))
+    %     title("Error Model")
     
 end
 
-%% 4. Make it local to the center
-% local model, also the coordinates should be local
-% consider a way to change the local area relative to the center
+%% 4.1 Determine the local area for each data
+% Output:
+% AA(m,n,number) - the data from H_error, outside local area is all 0.
+% X_local(m,n,number) - the data of X, outside local area is all 0.
+% Y_local(m,n,number) - the data of Y, outside local area is all 0.
+
+% Parameters
+ux = 70; uy = 60;   % area upper bound to center
+lx = 50; ly = 60;   % area lower bound to center
+
+% Get the area of local space
+X_range = [Xc.*170-lx, Xc.*170+ux]; Y_range = [Yc.*80-ly, Yc.*80+uy];
+Local_area = ones(m,n,number); % 1 and 0 meshgrid, 1 represents the local area
+AA = zeros(m,n,number); % The data of local area
+X_local = zeros(m,n,number);
+Y_local = zeros(m,n,number); % the meshgrid of position value for local area
+
+for k = 1:number
+    % represent with logical value
+    X_area = X(1,:)<X_range(k,1); X_area = X_area | X(1,:)>X_range(k,2);
+    Y_area = Y(:,1)<Y_range(k,1); Y_area = Y_area | Y(:,1)>Y_range(k,2);
+    
+    % convert logical value to double
+    for i = 1:length(Y_area)
+        for j = 1:length(X_area)
+            if X_area(j) == 0 && Y_area(i) == 0
+                Local_area(i,j,k) = 1;
+            else
+                Local_area(i,j,k) = 0;
+            end
+        end
+    end
+    
+    % extract for X and Y
+    X_local(:,:,k) = Local_area(:,:,k) .* X; 
+    Y_local(:,:,k) = Local_area(:,:,k) .* Y;
+    
+    % extract the local data from data, not local => 0
+    AA(:,:,k) = Local_area(:,:,k) .* H_error(:,:,k);
+end
+
+%% 4.2 Plot to check the local area
+num = 30; % the data number: 1~61
+
+% Evaluation idea: plot AA to see whether your local area covers well!!
+figure; mesh(H_error(:,:,num));
+figure; mesh(AA(:,:,num));
+
+% Evaluation idea: Show the local area
+figure(88); hold on;
+title("Data No."+num+", the dataset point(red) and selected point(black)")
+
+plot(X,Y,'LineStyle','none','Marker','.','Color','[0.8500, 0.3250, 0.0980]')
+plot(Xc(num)*170,Yc(num)*80,'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.7)
+
+plot([X_range(num,1),X_range(num,2)],[Y_range(num,1),Y_range(num,1)],'Color','[0, 0, 0]')
+plot([X_range(num,1),X_range(num,2)],[Y_range(num,2),Y_range(num,2)],'Color','[0, 0, 0]')
+plot([X_range(num,1),X_range(num,1)],[Y_range(num,1),Y_range(num,2)],'Color','[0, 0, 0]')
+plot([X_range(num,2),X_range(num,2)],[Y_range(num,1),Y_range(num,2)],'Color','[0, 0, 0]')
 
 
-%% 5. Make it sparse!
+%% 5. Pick out all the data
+% pick all the data points in the determined local area!
+% and also their relative positions.
+
+BB = AA;
+
+
+%% 6. Make it sparse!
