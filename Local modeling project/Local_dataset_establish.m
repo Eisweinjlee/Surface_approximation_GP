@@ -37,13 +37,13 @@ end
 %% 2. The loading center data (normalized)
 Xc = [25*ones(5,1);50*ones(5,1);75*ones(15,1);50*ones(10,1);25*ones(10,1)];
 Yc = [zeros(15,1);40*ones(5,1);-40*ones(10,1);40*ones(10,1);-40*ones(5,1)];
-Xc = [Xc;62.5;37.5;25;25;37.5;62.5;75;75;50;50;62.5;37.5;37.5;37.5;62.5;62.5]./100;
-Yc = [Yc;40;40;20;-20;-40;-40;-20;20;20;-20;0;0;-20;20;20;-20]./80;
+Xc = [Xc;62.5;37.5;25;25;37.5;62.5;75;75;50;50;62.5;37.5;37.5;37.5;62.5;62.5]*1.7;
+Yc = [Yc;40;40;20;-20;-40;-40;-20;20;20;-20;0;0;-20;20;20;-20];
 
 %% 3. The error model
 
 % the center, volume -> error data
-dep_center = [Xc*170,Yc*80]; Vol = zeros(number,1);
+dep_center = [Xc,Yc]; Vol = zeros(number,1);
 H_error = zeros(m,n,number);
 for i = 1:number
     Vol(i) = sum(H_data(:,:,i) ,'all');         % volume
@@ -72,7 +72,7 @@ ux = 70; uy = 60;   % area upper bound to center
 lx = 50; ly = 60;   % area lower bound to center
 
 % Get the area of local space
-X_range = [Xc.*170-lx, Xc.*170+ux]; Y_range = [Yc.*80-ly, Yc.*80+uy];
+X_range = [Xc-lx, Xc+ux]; Y_range = [Yc-ly, Yc+uy];
 Local_area = ones(m,n,number); % 1 and 0 meshgrid, 1 represents the local area
 H_local = zeros(m,n,number); % The data of local area
 X_local = zeros(m,n,number);
@@ -97,7 +97,6 @@ for k = 1:number
     % extract for X and Y
     X_local(:,:,k) = Local_area(:,:,k) .* X; 
     Y_local(:,:,k) = Local_area(:,:,k) .* Y;
-    
     % extract the local data from data, not local => 0
     H_local(:,:,k) = Local_area(:,:,k) .* H_error(:,:,k);
 end
@@ -123,7 +122,7 @@ for i = 1:step_length:m
 end
 
 %% 6. Plot to check the local area and data
-num = 13; % the data number: 1~61
+num = 2; % the data number: 1~61
 
 % Evaluation: plot H_local to see whether your local area covers well!!
 figure; mesh(H_error(:,:,num)); figure; mesh(H_local(:,:,num));
@@ -136,7 +135,7 @@ title("Data No." + num + ", the dataset point(red) and selected point(black)")
 plot(X,Y,'LineStyle','none','Marker','.','Color','[0.8500, 0.3250, 0.0980]')
 
 % soil loading center
-plot(Xc(num)*170,Yc(num)*80,'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.7)
+plot(Xc(num),Yc(num),'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.7)
 
 % local area bounds
 plot([X_range(num,1),X_range(num,2)],[Y_range(num,1),Y_range(num,1)],'Color','[0, 0, 0]')
@@ -145,9 +144,50 @@ plot([X_range(num,1),X_range(num,1)],[Y_range(num,1),Y_range(num,2)],'Color','[0
 plot([X_range(num,2),X_range(num,2)],[Y_range(num,1),Y_range(num,2)],'Color','[0, 0, 0]')
 
 % selected data points
-plot(X_local_sparse(:,:,num),Y_local_sparse(:,:,num),'LineStyle','none','Marker','x','Color','[0, 0, 0]')
-hold off;
+plot(X_local_sparse(:,:,num), Y_local_sparse(:,:,num),'LineStyle','none','Marker','x','Color','[0, 0, 0]')
+hold off; % (0,0) are not aovided.
 
 %% 7. Make a dataset
 % pick up all the selected data points in the determined local area!
-% and also their relative positions.
+% and also their normalized relative positions.
+% X_data = [Xc, Yc, Xre, Yre]
+% Y_data = H
+
+[m,n,number] = size(H_local_sparse);
+X_data = [];
+Y_data = [];
+
+for k = 1:number
+    
+    % get rid of the 0 elements in H_local_sparse, X_local_sparse, Y_local_sparse
+    XX = X_local_sparse(:,:,k);
+    YY = Y_local_sparse(:,:,k);
+    HH = H_local_sparse(:,:,k);
+    for i = m:-1:1
+        if sum(XX(i,:))==0 && sum(YY(i,:))==0 && sum(HH(i,:))==0
+            XX(i,:) = []; YY(i,:) = []; HH(i,:) = [];
+        end
+    end
+    for j = n:-1:1
+        if sum(XX(:,j))==0 && sum(YY(:,j))==0 && sum(HH(:,j))==0
+            XX(:,j) = []; YY(:,j) = []; HH(:,j) = [];
+        end
+    end
+    
+    % the relative positions and normalize
+    Xre = (XX - Xc(k))/170; Yre = (YY - Yc(k))/80;
+    Xre = Xre(:); Yre = Yre(:);
+    Xc_nor = Xc(k)/170 * ones(length(Xre),1);
+    Yc_nor = Yc(k)/80 * ones(length(Yre),1);
+    
+    % save the data to dataset vector
+    Y_data = [Y_data; HH(:)];
+    X_data = [X_data; Xc_nor, Yc_nor, Xre, Yre];
+end
+
+disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_data(1,:)))
+
+% X_test
+X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80];
+
+save local_dataset X_data Y_data X Y
