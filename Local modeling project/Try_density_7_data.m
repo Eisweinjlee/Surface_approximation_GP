@@ -137,4 +137,4 @@ Y_local = Y_local./80;
 X_test = [X_local(:),Y_local(:)];
 
 save local_sparse_7_data X_data Y_data X_test X_local Y_local
-disp("The dataset size is N=" + length(X_data(:,1)) + " with D=" + length(X_data(:,2)))
+disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_data(1,:)))
