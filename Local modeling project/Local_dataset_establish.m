@@ -132,7 +132,7 @@ figure; hold on;
 title("Data No." + num + ", the dataset point(red) and selected point(black)")
 
 % full data points
-plot(X,Y,'LineStyle','none','Marker','.','Color','[0.8500, 0.3250, 0.0980]')
+plot(X,Y,'LineStyle','none','Marker','.','Color',[218,165,32]/255)
 
 % soil loading center
 plot(Xc(num),Yc(num),'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.7)

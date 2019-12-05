@@ -64,11 +64,11 @@ elseif Mode_flag == 1 % only predict
     % load trained parameters
     load data20191204.mat
     
-    for xx = [0.15 0.50 0.85]
-        for yy =[-0.7 -0.4 0 0.4 0.7]
+    for xx = [0.5] % [0.15 0.50 0.85]
+        for yy = [0] % [-0.7 -0.4 0 0.4 0.7]
             
             % test data
-            %     xx = 0.1; yy = 0.8; % normalized loading center
+            % xx = 0.1; yy = 0.8; % normalized loading center
             X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170, (Y(:)-yy*80)/80];
             
             [ymu,ys2] = gp(hyp_sparseGP, inff, meanfunc, cov, likfunc,...
@@ -82,6 +82,22 @@ elseif Mode_flag == 1 % only predict
             figure
             mesh(X, Y, H_local_sparse)
             title("$X_c=$"+xx*170+", $Y_c=$"+yy*80,'Interpreter','latex')
+            
+            s_upper = ymu + 2*sqrt(ys2);
+            s_lower = ymu - 2*sqrt(ys2);
+            s_upper = reshape(s_upper,[m,n]);
+            s_lower= reshape(s_lower,[m,n]);
+            
+            figure
+            hold on
+            sur1 = surf(X,Y,H_local_sparse);
+            sur1.EdgeColor = 'flat';
+            sur2 = surf(X,Y,s_upper,'FaceAlpha',0.3);
+            sur2.EdgeColor = 'none';
+            sur3 = surf(X,Y,s_lower,'FaceAlpha',0.3);
+            sur3.EdgeColor = 'none';
+            view([-23,20])
+            hold off;
         end
     end
     
