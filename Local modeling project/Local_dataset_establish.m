@@ -34,7 +34,7 @@ for i = 1:16
     H_data(:,:,number) = dep - H0;
 end
 
-%% 2. The loading center data (normalized)
+%% 2. The loading center data
 Xc = [25*ones(5,1);50*ones(5,1);75*ones(15,1);50*ones(10,1);25*ones(10,1)];
 Yc = [zeros(15,1);40*ones(5,1);-40*ones(10,1);40*ones(10,1);-40*ones(5,1)];
 Xc = [Xc;62.5;37.5;25;25;37.5;62.5;75;75;50;50;62.5;37.5;37.5;37.5;62.5;62.5]*1.7;
@@ -48,7 +48,7 @@ H_error = zeros(m,n,number);
 for i = 1:number
     Vol(i) = sum(H_data(:,:,i) ,'all');         % volume
     
-    delta_H = function_input_2d(X,Y,dep_center(i,:)',2.96*Vol(i),Sigma,the,xf,yr,yl);
+    delta_H = function_input_2d(X,Y,dep_center(i,:)',3.75*Vol(i),Sigma,the,xf,yr,yl);
     H_error(:,:,i) = H_data(:,:,i) - delta_H;   % error data
     
     %     close all % test use (study about the error distribution!)
@@ -69,7 +69,7 @@ end
 
 % Parameters
 ux = 70; uy = 60;   % area upper bound to center
-lx = 50; ly = 60;   % area lower bound to center
+lx = 70; ly = 60;   % area lower bound to center
 
 % Get the area of local space
 X_range = [Xc-lx, Xc+ux]; Y_range = [Yc-ly, Yc+uy];
@@ -122,7 +122,8 @@ for i = 1:step_length:m
 end
 
 %% 6. Plot to check the local area and data
-num = 2; % the data number: 1~61
+num = 7; % the data number: 1~61
+for num = [2, 7, 14, 59]
 
 % Evaluation: plot H_local to see whether your local area covers well!!
 figure; mesh(H_error(:,:,num)); figure; mesh(H_local(:,:,num));
@@ -146,6 +147,8 @@ plot([X_range(num,2),X_range(num,2)],[Y_range(num,1),Y_range(num,2)],'Color','[0
 % selected data points
 plot(X_local_sparse(:,:,num), Y_local_sparse(:,:,num),'LineStyle','none','Marker','x','Color','[0, 0, 0]')
 hold off; % (0,0) are not aovided.
+
+end
 
 %% 7. Make a dataset
 % pick up all the selected data points in the determined local area!
@@ -190,4 +193,6 @@ disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_da
 % X_test
 X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80];
 
-save local_dataset X_data Y_data X Y
+filename = "local_dataset.mat";
+save(filename,'X_data','Y_data', 'X', 'Y')
+disp("The data is saved as "+ filename)

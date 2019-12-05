@@ -26,7 +26,7 @@ inff = @(varargin) infmethod(varargin{:},struct('s', 0));
 %% 2. The prediction
 
 % normalized center: Xc=[0,1], Yc=[-1,1]
-Xc_nor = 0.5; Yc_nor = 0;
+Xc_nor = 0.5; Yc_nor = 0.5;
 Xc = Xc_nor * 170; Yc = Yc_nor * 80;
 % test data
 X_test = [Xc_nor*ones(9400,1), Yc_nor*zeros(9400,1), (X(:)-Xc)/170, (Y(:)-Yc)/80];
@@ -74,8 +74,9 @@ cov_cen = CovDist(minY_p,minX_p); % the covariance of center
 w = cov_cen ./ CovDist;
 
 % Sigmoid function
-a = 2; b = 7;c = 0; % https://www.desmos.com/calculator/kn9tpwdan5
-gw = 1./(1 + exp(a + -b.*(w-c))); % sigmoid
+a = 2; b = 7; % https://www.desmos.com/calculator/kn9tpwdan5
+% a = 6; b = 10.8;
+gw = 1./(1 + exp(a + -b.*w)); % sigmoid
 % q = 0:0.01:max(w,[],'all'); % plot to see the sigmoid
 % gw = 1./(1 + exp(a + -b.*(q-c))); % sigmoid
 % figure; plot(q,gw); grid on
@@ -90,14 +91,22 @@ H_modified = gw .* H_error_pred;
 excavator_data;
 Vol = 7.5889e+04;
 
-H_nominal = function_input_2d(X,Y,[Xc;Yc],2.96*Vol,Sigma,the,xf,yr,yl);
+H_nominal = function_input_2d(X,Y,[Xc;Yc],3.75*Vol,Sigma,the,xf,yr,yl);
 H_noGP = H0 + H_nominal;
 H_combination = H_noGP + H_modified;
 
-figure; subplot(1,2,1); mesh(X,Y,H_noGP); 
-xlim([0 170]); zlim([-50 40]); title("before");
-subplot(1,2,2); mesh(X,Y,H_combination); zlim([-20 20]);
-xlim([0 170]); zlim([-50 40]); title("after");
-
+% figure; subplot(1,2,1); mesh(X,Y,H_noGP); 
+% xlim([0 170]); zlim([-50 40]); title("before");
+% subplot(1,2,2); mesh(X,Y,H_combination); zlim([-20 20]);
+% xlim([0 170]); zlim([-50 40]); title("after");
 
 %% 5. Evaluate the performance
+docName = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
+filename = docName + "74" +".mat";
+load(filename)
+immse(H_combination, dep)
+
+figure; subplot(1,2,1); mesh(X,Y,H_combination); 
+xlim([0 170]); zlim([-50 40]); title("Nominal+GP");
+subplot(1,2,2); mesh(X,Y,dep); zlim([-20 20]);
+xlim([0 170]); zlim([-50 40]); title("Real");

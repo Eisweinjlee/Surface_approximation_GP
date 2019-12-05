@@ -27,7 +27,7 @@ infmethod = @infGaussLik;               % inference with Guassian Likelihood
 hyp_init = struct('mean', [], 'cov', [0 0 0 0 0], 'lik', -1);
 
 % inducing points
-xu = X_test(1:200:end,:);
+xu = X_test(1:90:end,:);
 cov = {'apxSparse', covfunc, xu};
 inff = @(varargin) infmethod(varargin{:},struct('s', 0));
 % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
@@ -41,6 +41,7 @@ if Mode_flag == 0 % training & predict
     Time_of_SparseGP = toc
     
     save data20191204 hyp_sparseGP
+    disp("Trained model is saved.")
     
     %% Predict
     [ymu,ys2] = gp(hyp_sparseGP, inff, meanfunc, cov, likfunc,...
@@ -64,8 +65,8 @@ elseif Mode_flag == 1 % only predict
     % load trained parameters
     load data20191204.mat
     
-    for xx = [0.5] % [0.15 0.50 0.85]
-        for yy = [0] % [-0.7 -0.4 0 0.4 0.7]
+    for xx = [0.15 0.50 0.85]
+        for yy = [-0.7 -0.4 0 0.4 0.7]
             
             % test data
             % xx = 0.1; yy = 0.8; % normalized loading center
