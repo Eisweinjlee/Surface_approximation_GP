@@ -26,9 +26,10 @@ inff = @(varargin) infmethod(varargin{:},struct('s', 0));
 %% 2. The prediction
 
 % normalized center: Xc=[0,1], Yc=[-1,1]
-Xc = 0.1; Yc = 0.8; 
+Xc_nor = 0.5; Yc_nor = 0;
+Xc = Xc_nor * 170; Yc = Yc_nor * 80;
 % test data
-X_test = [Xc*ones(9400,1), Yc*zeros(9400,1), (X(:)-Xc*170)/170, (Y(:)-Yc*80)/80];
+X_test = [Xc_nor*ones(9400,1), Yc_nor*zeros(9400,1), (X(:)-Xc)/170, (Y(:)-Yc)/80];
 
 % prediction
 [ymu,ys2] = gp(hyp_sparseGP, inff, meanfunc, cov, likfunc,...
@@ -57,7 +58,7 @@ CovDist = reshape(ys2,[m,n]);
 %% 3. Relative covariance modification
 
 % find the data close to center X(1,:), Y(:,1)
-disX = (X(1,:)-Xc*170).^2; disY = (Y(:,1)-Yc*80)'.^2;
+disX = (X(1,:)-Xc).^2; disY = (Y(:,1)-Yc)'.^2;
 [minX_v,minX_p] = min(disX); [minY_v,minY_p] = min(disY);
 data_cen = [X(1,minX_p);Y(minY_p,1)];
 
@@ -73,21 +74,30 @@ cov_cen = CovDist(minY_p,minX_p); % the covariance of center
 w = cov_cen ./ CovDist;
 
 % Sigmoid function
-% a = 3; b = 5.2; c = 0;
-% a = 2; b = 5.7; c = 0;
-a = 2; b = 7;c = 0;
+a = 2; b = 7;c = 0; % https://www.desmos.com/calculator/kn9tpwdan5
 gw = 1./(1 + exp(a + -b.*(w-c))); % sigmoid
-% q = 0:0.01:max(w,[],'all'); % see the sigmoid
+% q = 0:0.01:max(w,[],'all'); % plot to see the sigmoid
 % gw = 1./(1 + exp(a + -b.*(q-c))); % sigmoid
 % figure; plot(q,gw); grid on
 
 % modify the mean predition through sigmoid
 H_modified = gw .* H_error_pred;
-% Plot: before modification and after
-figure; subplot(1,2,1); mesh(X,Y,H_error_pred); zlim([-20 20]); title("before");
-subplot(1,2,2); mesh(X,Y,H_modified); zlim([-20 20]);title("after");
-
+% % Plot: before modification and after
+% figure; subplot(1,2,1); mesh(X,Y,H_error_pred); zlim([-20 20]); title("before");
+% subplot(1,2,2); mesh(X,Y,H_modified); zlim([-20 20]);title("after");
 
 %% 4. Add to the nominal Gaussian pdf model
+excavator_data;
+Vol = 7.5889e+04;
+
+H_nominal = function_input_2d(X,Y,[Xc;Yc],2.96*Vol,Sigma,the,xf,yr,yl);
+H_noGP = H0 + H_nominal;
+H_combination = H_noGP + H_modified;
+
+figure; subplot(1,2,1); mesh(X,Y,H_noGP); 
+xlim([0 170]); zlim([-50 40]); title("before");
+subplot(1,2,2); mesh(X,Y,H_combination); zlim([-20 20]);
+xlim([0 170]); zlim([-50 40]); title("after");
+
 
 %% 5. Evaluate the performance
