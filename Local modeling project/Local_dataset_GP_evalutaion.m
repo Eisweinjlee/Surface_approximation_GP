@@ -73,7 +73,9 @@ cov_cen = CovDist(minY_p,minX_p); % the covariance of center
 w = cov_cen ./ CovDist;
 
 % Sigmoid function
-a = 7.5; b = 12.4; c = 0;
+% a = 3; b = 5.2; c = 0;
+% a = 2; b = 5.7; c = 0;
+a = 2; b = 7;c = 0;
 gw = 1./(1 + exp(a + -b.*(w-c))); % sigmoid
 % q = 0:0.01:max(w,[],'all'); % see the sigmoid
 % gw = 1./(1 + exp(a + -b.*(q-c))); % sigmoid
@@ -81,8 +83,9 @@ gw = 1./(1 + exp(a + -b.*(w-c))); % sigmoid
 
 % modify the mean predition through sigmoid
 H_modified = gw .* H_error_pred;
-figure; subplot(1,2,1); mesh(X,Y,H_error_pred);
-subplot (1,2,2); mesh(X,Y,H_modified);
+% Plot: before modification and after
+figure; subplot(1,2,1); mesh(X,Y,H_error_pred); zlim([-20 20]); title("before");
+subplot(1,2,2); mesh(X,Y,H_modified); zlim([-20 20]);title("after");
 
 
 %% 4. Add to the nominal Gaussian pdf model
