@@ -8,15 +8,18 @@ clear
 Mode_flag = 1; % 0: training & predict, 1: only predict
 
 %% load the dataset
-load local_dataset.mat
+load local_dataset-06-Dec-2019.mat
 % X_data, Y_data, X, Y
+
 % test data
 xx = 0.5; yy = 0; % normalized loading center
-X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170, (Y(:)-yy*80)/80];
+Vol = 7.5889e+4; 
+X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170,...
+    (Y(:)-yy*80)/80, Vol/1e+5*ones(9400,1)];
 
 %% Gaussian Process parameters
 
-N = 500;  % iteration times limitation
+N = 400;  % iteration times limitation
 
 % Specify the mean, cov, likelihood
 meanfunc = [];                    % empty: don't use a mean function
@@ -24,10 +27,12 @@ covfunc = {@covSEard};              % ARD SE
 likfunc = {@likGauss};              % Gaussian likelihood
 infmethod = @infGaussLik;               % inference with Guassian Likelihood
 % The hyperparameter struct
-hyp_init = struct('mean', [], 'cov', [0 0 0 0 0], 'lik', -1);
+hyp_init = struct('mean', [], 'cov', zeros(1,length(X_data(1,:))+1), 'lik', -1);
 
 % inducing points
-xu = X_test(1:90:end,:);
+require_num = 1.5*log10(length(X_data(:,1)))^(length(X_data(1,:)));
+step_length = floor(length(X_data(:,1))/require_num);
+xu = X_data(1:step_length:end,:);
 cov = {'apxSparse', covfunc, xu};
 inff = @(varargin) infmethod(varargin{:},struct('s', 0));
 % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
@@ -40,7 +45,7 @@ if Mode_flag == 0 % training & predict
         X_data, Y_data);
     Time_of_SparseGP = toc
     
-    save data20191204 hyp_sparseGP
+    save("model-"+date, 'hyp_sparseGP')
     disp("Trained model is saved.")
     
     %% Predict
@@ -63,14 +68,15 @@ elseif Mode_flag == 1 % only predict
     %% Predict
     
     % load trained parameters
-    load data20191204.mat
+    load("model-"+date+".mat")
     
     for xx = [0.15 0.50 0.85]
         for yy = [-0.7 -0.4 0 0.4 0.7]
             
             % test data
             % xx = 0.1; yy = 0.8; % normalized loading center
-            X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170, (Y(:)-yy*80)/80];
+            X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170,...
+                (Y(:)-yy*80)/80, Vol/1e+5*ones(9400,1)];
             
             [ymu,ys2] = gp(hyp_sparseGP, inff, meanfunc, cov, likfunc,...
                 X_data, Y_data, X_test);

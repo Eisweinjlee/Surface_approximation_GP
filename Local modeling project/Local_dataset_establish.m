@@ -105,7 +105,7 @@ end
 % Because different data has different size of local area,
 % here let us make it sparse first.
 
-step_length = 15; % level of sparseness
+step_length = 17; % level of sparseness
 
 H_local_sparse = []; X_local_sparse = []; Y_local_sparse = [];
 
@@ -122,8 +122,8 @@ for i = 1:step_length:m
 end
 
 %% 6. Plot to check the local area and data
-num = 7; % the data number: 1~61
-for num = [2, 7, 14, 59]
+num = 8; % the data number: 1~61
+for num = [2, 17, 22, 26]
 
 % Evaluation: plot H_local to see whether your local area covers well!!
 figure; mesh(H_error(:,:,num)); figure; mesh(H_local(:,:,num));
@@ -183,16 +183,20 @@ for k = 1:number
     Xc_nor = Xc(k)/170 * ones(length(Xre),1);
     Yc_nor = Yc(k)/80 * ones(length(Yre),1);
     
+    % Volume
+    Vol_nor = Vol(k)/1e+5 * ones(length(Xre),1);
+    
     % save the data to dataset vector
     Y_data = [Y_data; HH(:)];
-    X_data = [X_data; Xc_nor, Yc_nor, Xre, Yre];
+    X_data = [X_data; Xc_nor, Yc_nor, Xre, Yre, Vol_nor];
 end
 
 disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_data(1,:)))
 
 % X_test
-X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80];
+X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80,...
+    7.5889e+4/1e+5*ones(9400,1)];
 
-filename = "local_dataset"+ date +".mat";
+filename = "local_dataset-"+ date +".mat";
 save(filename,'X_data','Y_data', 'X', 'Y')
 disp("The data is saved as "+ filename)

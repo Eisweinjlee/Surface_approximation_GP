@@ -8,9 +8,9 @@ clear
 %% 1. Load the model and specify parameters
 
 % load the dataset: X_data, Y_data, X, Y
-load local_dataset.mat
+load local_dataset-06-Dec-2019.mat
 % load trained parameters: hyp_sparseGP
-load data20191204.mat
+load model-06-Dec-2019.mat
 
 % Specify the mean, cov, likelihood
 meanfunc = [];                      % empty: don't use a mean function
@@ -19,17 +19,47 @@ likfunc = {@likGauss};              % Gaussian likelihood
 infmethod = @infGaussLik;           % inference with Guassian Likelihood
 
 % inducing points
-xu = X_data(1:10:end,:); cov = {'apxSparse', covfunc, xu};
+xu = hyp_sparseGP.xu; cov = {'apxSparse', covfunc, xu};
 inff = @(varargin) infmethod(varargin{:},struct('s', 0));
 % VFE, opt.s = 0; SPEP, 0 <opt.s < 1; FITC, opt.s = 1
 
-%% 2. The prediction
+%% 2. Load the data for evaluation
+Xc = [25*ones(5,1);50*ones(5,1);75*ones(15,1);50*ones(10,1);25*ones(10,1)];
+Yc = [zeros(15,1);40*ones(5,1);-40*ones(10,1);40*ones(10,1);-40*ones(5,1)];
+Xc = [Xc;62.5;37.5;25;25;37.5;62.5;75;75;50;50;62.5;37.5;37.5;37.5;62.5;62.5]*1.7;
+Yc = [Yc;40;40;20;-20;-40;-40;-20;20;20;-20;0;0;-20;20;20;-20];
+m = 94; n = 100;
+
+docName = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
+H_data = zeros(m,n,61);
+
+% load datas
+number = 0;
+for i = 1:9
+    for j = 1:5
+        number = number + 1;
+        filename = docName + num2str(10*i+j)+".mat";
+        load(filename)
+        H_data(:,:,number) = dep;
+    end
+end
+for i = 1:16
+    number = number + 1;
+    filename = docName + num2str(100+i)+".mat";
+    load(filename)
+    H_data(:,:,number) = dep;
+end
+
+err = zeros(number,1);
+for i = 1:number % start evaluation
+%% 3. The prediction
 
 % normalized center: Xc=[0,1], Yc=[-1,1]
-Xc_nor = 0.25; Yc_nor = -0.5;
-Xc = Xc_nor * 170; Yc = Yc_nor * 80;
+Xc_nor = Xc(i)/170; Yc_nor = Yc(i)/80;
+
 % test data
-X_test = [Xc_nor*ones(9400,1), Yc_nor*zeros(9400,1), (X(:)-Xc)/170, (Y(:)-Yc)/80];
+X_test = [Xc_nor*ones(9400,1), Yc_nor*zeros(9400,1), ...
+    (X(:)-Xc(i))/170, (Y(:)-Yc(i))/80, 7.5889e+4/1e+5*ones(9400,1)];
 
 % prediction
 [ymu,ys2] = gp(hyp_sparseGP, inff, meanfunc, cov, likfunc,...
@@ -58,7 +88,7 @@ CovDist = reshape(ys2,[m,n]);
 %% 3. Relative covariance modification
 
 % find the data close to center X(1,:), Y(:,1)
-disX = (X(1,:)-Xc).^2; disY = (Y(:,1)-Yc)'.^2;
+disX = (X(1,:)-Xc(i)).^2; disY = (Y(:,1)-Yc(i))'.^2;
 [minX_v,minX_p] = min(disX); [minY_v,minY_p] = min(disY);
 data_cen = [X(1,minX_p);Y(minY_p,1)];
 
@@ -91,38 +121,27 @@ H_modified = gw .* H_error_pred;
 excavator_data;
 Vol = 7.5889e+04;
 
-H_nominal = function_input_2d(X,Y,[Xc;Yc],3.75*Vol,Sigma,the,xf,yr,yl);
+H_nominal = function_input_2d(X,Y,[Xc(i);Yc(i)],3.75*Vol,Sigma,the,xf,yr,yl);
 H_noGP = H0 + H_nominal;
 H_combination = H_noGP + H_modified;
 
 %% 5. Evaluate the performance
-docName = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
-filename = docName + "93" +".mat";
-load(filename)
-err = sqrt(immse(H_combination, dep))
+err(i) = sqrt(immse(H_combination, H_data(:,:,i)));
 
-figure; 
-subplot(1,3,1); mesh(X,Y,H_noGP); 
-xlim([0 170]); zlim([-50 40]); title("Nominal");zlabel("h[mm]")
-subplot(1,3,2); mesh(X,Y,H_combination); 
-xlim([0 170]); zlim([-50 40]); title("Nominal+GP");
-subplot(1,3,3); mesh(X,Y,dep); zlim([-20 20]);
-xlim([0 170]); zlim([-50 40]); title("Real, nMSE= "+err);
+% figure; 
+% subplot(1,3,1); mesh(X,Y,H_noGP); 
+% xlim([0 170]); zlim([-50 40]); title("Nominal");zlabel("h[mm]")
+% subplot(1,3,2); mesh(X,Y,H_combination); 
+% xlim([0 170]); zlim([-50 40]); title("Nominal+GP");
+% subplot(1,3,3); mesh(X,Y,H_data(:,:,i)); zlim([-20 20]);
+% xlim([0 170]); zlim([-50 40]); title("Real, nMSE= " + err(i));
 
-% H_data = zeros(m,n,61);
+end
 
-% % load others
-% number = 0;
-% for i = 1:9
-%     for j = 1:5
-%         number = number + 1;
-%         filename = docName + num2str(10*i+j)+".mat";
-%         load(filename)
-%         H_data(:,:,number) = dep - H0;
-%     end
-% end
-% for i = 1:16
-%     number = number + 1;
-%     filename = docName + num2str(100+i)+".mat";
-%     load(filename)
-%     H_data(:,:,number) = dep - H0;
+% 6. plot the normalize MSE
+mean(err)
+figure; hold on; grid on;
+plot(err,'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.2);
+plot([0 number],[mean(err) mean(err)],'--','Linewidth',1.2)
+xlim([0 number]); ylim([0 7]);
+xlabel("[mm]");
