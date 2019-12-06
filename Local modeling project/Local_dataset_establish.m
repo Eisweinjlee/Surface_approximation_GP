@@ -48,7 +48,7 @@ H_error = zeros(m,n,number);
 for i = 1:number
     Vol(i) = sum(H_data(:,:,i) ,'all');         % volume
     
-    delta_H = function_input_2d(X,Y,dep_center(i,:)',3.75*Vol(i),Sigma,the,xf,yr,yl);
+    delta_H = function_input_2d(X,Y,dep_center(i,:)',kV*Vol(i),Sigma,the,xf,yr,yl);
     H_error(:,:,i) = H_data(:,:,i) - delta_H;   % error data
     
     %     close all % test use (study about the error distribution!)
@@ -193,6 +193,6 @@ disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_da
 % X_test
 X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80];
 
-filename = "local_dataset.mat";
+filename = "local_dataset"+ date +".mat";
 save(filename,'X_data','Y_data', 'X', 'Y')
 disp("The data is saved as "+ filename)

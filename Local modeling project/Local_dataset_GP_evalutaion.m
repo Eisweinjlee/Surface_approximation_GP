@@ -26,7 +26,7 @@ inff = @(varargin) infmethod(varargin{:},struct('s', 0));
 %% 2. The prediction
 
 % normalized center: Xc=[0,1], Yc=[-1,1]
-Xc_nor = 0.5; Yc_nor = 0.5;
+Xc_nor = 0.25; Yc_nor = -0.5;
 Xc = Xc_nor * 170; Yc = Yc_nor * 80;
 % test data
 X_test = [Xc_nor*ones(9400,1), Yc_nor*zeros(9400,1), (X(:)-Xc)/170, (Y(:)-Yc)/80];
@@ -75,7 +75,7 @@ w = cov_cen ./ CovDist;
 
 % Sigmoid function
 a = 2; b = 7; % https://www.desmos.com/calculator/kn9tpwdan5
-% a = 6; b = 10.8;
+% a = 9; b = 14.2;
 gw = 1./(1 + exp(a + -b.*w)); % sigmoid
 % q = 0:0.01:max(w,[],'all'); % plot to see the sigmoid
 % gw = 1./(1 + exp(a + -b.*(q-c))); % sigmoid
@@ -95,18 +95,34 @@ H_nominal = function_input_2d(X,Y,[Xc;Yc],3.75*Vol,Sigma,the,xf,yr,yl);
 H_noGP = H0 + H_nominal;
 H_combination = H_noGP + H_modified;
 
-% figure; subplot(1,2,1); mesh(X,Y,H_noGP); 
-% xlim([0 170]); zlim([-50 40]); title("before");
-% subplot(1,2,2); mesh(X,Y,H_combination); zlim([-20 20]);
-% xlim([0 170]); zlim([-50 40]); title("after");
-
 %% 5. Evaluate the performance
 docName = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
-filename = docName + "74" +".mat";
+filename = docName + "93" +".mat";
 load(filename)
-immse(H_combination, dep)
+err = sqrt(immse(H_combination, dep))
 
-figure; subplot(1,2,1); mesh(X,Y,H_combination); 
+figure; 
+subplot(1,3,1); mesh(X,Y,H_noGP); 
+xlim([0 170]); zlim([-50 40]); title("Nominal");zlabel("h[mm]")
+subplot(1,3,2); mesh(X,Y,H_combination); 
 xlim([0 170]); zlim([-50 40]); title("Nominal+GP");
-subplot(1,2,2); mesh(X,Y,dep); zlim([-20 20]);
-xlim([0 170]); zlim([-50 40]); title("Real");
+subplot(1,3,3); mesh(X,Y,dep); zlim([-20 20]);
+xlim([0 170]); zlim([-50 40]); title("Real, nMSE= "+err);
+
+% H_data = zeros(m,n,61);
+
+% % load others
+% number = 0;
+% for i = 1:9
+%     for j = 1:5
+%         number = number + 1;
+%         filename = docName + num2str(10*i+j)+".mat";
+%         load(filename)
+%         H_data(:,:,number) = dep - H0;
+%     end
+% end
+% for i = 1:16
+%     number = number + 1;
+%     filename = docName + num2str(100+i)+".mat";
+%     load(filename)
+%     H_data(:,:,number) = dep - H0;
