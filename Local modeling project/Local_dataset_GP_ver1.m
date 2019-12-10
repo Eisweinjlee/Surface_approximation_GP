@@ -5,17 +5,16 @@
 close all
 clear
 
-Mode_flag = 1; % 0: training & predict, 1: only predict
+Mode_flag = 0; % 0: training & predict, 1: only predict
 
 %% load the dataset
-load local_dataset-06-Dec-2019.mat
+load local_dataset-10-Dec-2019.mat
 % X_data, Y_data, X, Y
 
 % test data
-xx = 0.5; yy = 0; % normalized loading center
-Vol = 7.5889e+4; 
+xx = 0.5; yy = 0; vol = 1.0; % normalized loading center
 X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170,...
-    (Y(:)-yy*80)/80, Vol/1e+5*ones(9400,1)];
+    (Y(:)-yy*80)/80, vol*ones(9400,1)];
 
 %% Gaussian Process parameters
 
@@ -68,15 +67,16 @@ elseif Mode_flag == 1 % only predict
     %% Predict
     
     % load trained parameters
-    load("model-"+date+".mat")
+    load("model-10-Dec-2019.mat")
     
-    for xx = [0.15 0.50 0.85]
-        for yy = [-0.7 -0.4 0 0.4 0.7]
+    for xx = [0.2 0.8]
+        for yy = [-0.5 0.0 0.5]
+            for vol = [0.3 0.6]
             
             % test data
             % xx = 0.1; yy = 0.8; % normalized loading center
             X_test = [xx*ones(9400,1), yy*zeros(9400,1), (X(:)-xx*170)/170,...
-                (Y(:)-yy*80)/80, Vol/1e+5*ones(9400,1)];
+                (Y(:)-yy*80)/80, vol*ones(9400,1)];
             
             [ymu,ys2] = gp(hyp_sparseGP, inff, meanfunc, cov, likfunc,...
                 X_data, Y_data, X_test);
@@ -84,27 +84,32 @@ elseif Mode_flag == 1 % only predict
             % reshape the result
             m = 94; n = 100;
             H_local_sparse = reshape(ymu,[m,n]);
+            Cov_dist = reshape(ys2,[m,n]);
             
             % figure
             figure
             mesh(X, Y, H_local_sparse)
-            title("$X_c=$"+xx*170+", $Y_c=$"+yy*80,'Interpreter','latex')
-            
-            s_upper = ymu + 2*sqrt(ys2);
-            s_lower = ymu - 2*sqrt(ys2);
-            s_upper = reshape(s_upper,[m,n]);
-            s_lower= reshape(s_lower,[m,n]);
+            title("$X_c=$"+xx*170+", $Y_c=$"+yy*80+", $V=$"+vol, 'Interpreter','latex')
             
             figure
-            hold on
-            sur1 = surf(X,Y,H_local_sparse);
-            sur1.EdgeColor = 'flat';
-            sur2 = surf(X,Y,s_upper,'FaceAlpha',0.3);
-            sur2.EdgeColor = 'none';
-            sur3 = surf(X,Y,s_lower,'FaceAlpha',0.3);
-            sur3.EdgeColor = 'none';
-            view([-23,20])
-            hold off;
+            mesh(X, Y, Cov_dist)
+            
+%             s_upper = ymu + 2*sqrt(ys2);
+%             s_lower = ymu - 2*sqrt(ys2);
+%             s_upper = reshape(s_upper,[m,n]);
+%             s_lower = reshape(s_lower,[m,n]);
+%             
+%             figure
+%             hold on
+%             sur1 = surf(X,Y,H_local_sparse);
+%             sur1.EdgeColor = 'flat';
+%             sur2 = surf(X,Y,s_upper,'FaceAlpha',0.3);
+%             sur2.EdgeColor = 'none';
+%             sur3 = surf(X,Y,s_lower,'FaceAlpha',0.3);
+%             sur3.EdgeColor = 'none';
+%             view([-23,20])
+%             hold off;
+            end
         end
     end
     

@@ -2,43 +2,66 @@
 % with the "dataset_20191108_normalized"
 % Author: Li, Yang
 % Date: Dec 3rd, 2019
-
 close all
 clear
 
-excavator_data;
-docName = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
+run('C:\Users\LI\Desktop\Approx_Surface\Local modeling project\excavator_data.m')
+load('nominal_modle_para.mat', 'kV')
+docName1 = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
+docName2 = "Approx_Surface\ErrorData training project\dataset_20191209_normalized\";
 
 %% 1. Loading the data (changed for different data)
 
 % load the empty vessel
-load(docName + "00.mat",'dep')
+load(docName1 + "00.mat",'dep')
 H0 = dep;
 [m,n] = size(dep);
 H_data = zeros(m,n,61);
 
-% load others
+% load docName1 - Position difference
 number = 0;
 for i = 1:9
     for j = 1:5
         number = number + 1;
-        filename = docName + num2str(10*i+j)+".mat";
+        filename = docName1 + num2str(10*i+j)+".mat";
         load(filename)
         H_data(:,:,number) = dep - H0;
     end
 end
 for i = 1:16
     number = number + 1;
-    filename = docName + num2str(100+i)+".mat";
+    filename = docName1 + num2str(100+i)+".mat";
     load(filename)
     H_data(:,:,number) = dep - H0;
 end
 
-%% 2. The loading center data
+% load docName2 - Volume difference
+for i = 1:9
+    for j = 1:4
+        number = number + 1;
+        filename = docName2 + num2str(10*i+j)+".mat";
+        load(filename)
+        H_data(:,:,number) = dep - H0;
+    end
+end
+
+
+%% 2.1 The loading center data
+% docName1
 Xc = [25*ones(5,1);50*ones(5,1);75*ones(15,1);50*ones(10,1);25*ones(10,1)];
 Yc = [zeros(15,1);40*ones(5,1);-40*ones(10,1);40*ones(10,1);-40*ones(5,1)];
-Xc = [Xc;62.5;37.5;25;25;37.5;62.5;75;75;50;50;62.5;37.5;37.5;37.5;62.5;62.5]*1.7;
+Xc = [Xc;62.5;37.5;25;25;37.5;62.5;75;75;50;50;62.5;37.5;37.5;37.5;62.5;62.5];
 Yc = [Yc;40;40;20;-20;-40;-40;-20;20;20;-20;0;0;-20;20;20;-20];
+
+% docName2
+Xc = [Xc;25*ones(4,1);50*ones(4,1);75*ones(12,1);50*ones(8,1);25*ones(8,1)]*1.7;
+Yc = [Yc;zeros(12,1);40*ones(4,1);-40*ones(8,1);40*ones(8,1);-40*ones(4,1)];
+
+%% 2.2 The volume data
+Vol_data = ones(61,1);
+for i = 1:9
+    Vol_data = [Vol_data;0.25;0.50;0.50;0.75];
+end
 
 %% 3. The error model
 
@@ -46,18 +69,18 @@ Yc = [Yc;40;40;20;-20;-40;-40;-20;20;20;-20;0;0;-20;20;20;-20];
 dep_center = [Xc,Yc]; Vol = zeros(number,1);
 H_error = zeros(m,n,number);
 for i = 1:number
-    Vol(i) = sum(H_data(:,:,i) ,'all');         % volume
+    Vol = 7.5889e+04;         % approx volume of full amount
     
-    delta_H = function_input_2d(X,Y,dep_center(i,:)',kV*Vol(i),Sigma,the,xf,yr,yl);
+    delta_H = function_input_2d(X,Y,dep_center(i,:)',kV*Vol_data(i)*Vol,Sigma,the,xf,yr,yl);
     H_error(:,:,i) = H_data(:,:,i) - delta_H;   % error data
     
-    %     close all % test use (study about the error distribution!)
-    %     figure
-    %     mesh(delta_H)
-    %     title("Gaussian pdf")
-    %     figure
-    %     mesh(H_error(:,:,i))
-    %     title("Error Model")
+%         close all % test use (study about the error distribution!)
+%         figure
+%         mesh(delta_H)
+%         title("Gaussian pdf")
+%         figure
+%         mesh(H_error(:,:,i))
+%         title("Error Model")
     
 end
 
@@ -97,6 +120,7 @@ for k = 1:number
     % extract for X and Y
     X_local(:,:,k) = Local_area(:,:,k) .* X; 
     Y_local(:,:,k) = Local_area(:,:,k) .* Y;
+    
     % extract the local data from data, not local => 0
     H_local(:,:,k) = Local_area(:,:,k) .* H_error(:,:,k);
 end
@@ -105,7 +129,7 @@ end
 % Because different data has different size of local area,
 % here let us make it sparse first.
 
-step_length = 17; % level of sparseness
+step_length = 5; % level of sparseness
 
 H_local_sparse = []; X_local_sparse = []; Y_local_sparse = [];
 
@@ -122,8 +146,8 @@ for i = 1:step_length:m
 end
 
 %% 6. Plot to check the local area and data
-num = 8; % the data number: 1~61
-for num = [2, 17, 22, 26]
+% num = 8; % the data number: 1~61 62~97
+for num = [16,21,25,27]
 
 % Evaluation: plot H_local to see whether your local area covers well!!
 figure; mesh(H_error(:,:,num)); figure; mesh(H_local(:,:,num));
@@ -184,7 +208,7 @@ for k = 1:number
     Yc_nor = Yc(k)/80 * ones(length(Yre),1);
     
     % Volume
-    Vol_nor = Vol(k)/1e+5 * ones(length(Xre),1);
+    Vol_nor = Vol_data(k) * ones(length(Xre),1);
     
     % save the data to dataset vector
     Y_data = [Y_data; HH(:)];
@@ -195,8 +219,10 @@ disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_da
 
 % X_test
 X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80,...
-    7.5889e+4/1e+5*ones(9400,1)];
+    1.0*ones(9400,1)];
+
+H0 = initializeH_2d(X,xc,xr,thr,thf);
 
 filename = "local_dataset-"+ date +".mat";
-save(filename,'X_data','Y_data', 'X', 'Y')
+save(filename,'X_data','Y_data', 'X', 'Y', 'H0')
 disp("The data is saved as "+ filename)
