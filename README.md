@@ -1,6 +1,6 @@
 # Surface_approximation_GP
 
-updated on October 17th, 2019
+updated on Dec 12th, 2019
 
 ### The Matlab programs in this project
 
@@ -16,9 +16,13 @@ updated on October 17th, 2019
 
 4. `Approx_Surface_SVGP.m` is going to implement the SVGP method [Titsias 2009].
 
-(On-going)
+5. `datasetReduction.m` is for reducing the dataset size in a naive way.
 
-5. Modeling for experiment data.
+6. Doc. "beautiful Gp demo code" is coded for my presentation to show how GP works and how sparse approximation works.
+
+(On-going works)
+
+7. Doc. "Local modeling project" is a project to train a GP-based error distribution prediction model for soil loading of excavator.
 
 ### References:
 
@@ -34,3 +38,5 @@ Titsias M. Variational learning of inducing variables in sparse Gaussian process
 <img width="350" src=https://user-images.githubusercontent.com/26374671/61990819-6815b180-b082-11e9-93e7-20d8b26ffc7a.png alt="Noisy data" />
 <img width="350" src=https://user-images.githubusercontent.com/26374671/61990831-95625f80-b082-11e9-93e5-d926ea108323.png alt="Original data" />
 </p>
+
+### The error distribution model for soil loading
