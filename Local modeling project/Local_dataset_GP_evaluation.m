@@ -8,9 +8,9 @@ clear
 %% 1. Load the model and specify parameters
 
 % load the dataset: X_data, Y_data, X, Y
-load local_dataset-10-Dec-2019.mat
+load local_dataset-12-Dec-2019.mat
 % load trained parameters: hyp_sparseGP
-load model-10-Dec-2019.mat
+load model-12-Dec-2019.mat
 
 % Specify the mean, cov, likelihood
 meanfunc = [];                      % empty: don't use a mean function
@@ -74,7 +74,7 @@ err = zeros(number,1);
 
 
 for i = 1:number % start evaluation
-% for i = 29
+% for i = 83
 %% 3. The prediction
 
 % normalized center: Xc=[0,1], Yc=[-1,1]
@@ -112,7 +112,7 @@ CovDist = reshape(ys2,[m,n]);
 
 % find the data close to center X(1,:), Y(:,1)
 disX = (X(1,:)-Xc(i)).^2; disY = (Y(:,1)-Yc(i))'.^2;
-[minX_v,minX_p] = min(disX); [minY_v,minY_p] = min(disY);
+[minX_v,minX_p] = min(disX); [minY_v,minY_p] =  min(disY);
 data_cen = [X(1,minX_p);Y(minY_p,1)];
 
 % % Plot: the loading center and data center
@@ -144,7 +144,12 @@ H_modified = gw .* H_error_pred;
 excavator_data;
 Vol = 7.5889e+04;
 
-H_nominal = function_input_2d(X,Y,[Xc(i);Yc(i)],3.75*Vol_data(i)*Vol,Sigma,the,xf,yr,yl);
+% Parameters optimized by Optimize_Nominal_Model_CenterMove.m
+lambdaX = 2.302227968708186e+03; lambdaY = 1.631169900899356e+03;
+kV = 3.445999018892074; Xmove = 2.1830e-07; Ymove = 0.207118001857057;
+Sigma = [lambdaX,0;0,lambdaY];
+
+H_nominal = function_input_2d(X,Y,[Xc(i);Yc(i)]-[Xmove;Ymove],kV*Vol_data(i)*Vol,Sigma,the,xf,yr,yl);
 H_noGP = H0 + H_nominal;
 H_combination = H_noGP + H_modified;
 
@@ -158,11 +163,12 @@ err(i) = sqrt(immse(H_combination, H_data(:,:,i)));
 % xlim([0 170]); zlim([-50 40]); title("Nominal+GP");
 % subplot(1,3,3); mesh(X,Y,H_data(:,:,i)); zlim([-20 20]);
 % xlim([0 170]); zlim([-50 40]); title("Real, nMSE= " + err(i));
-% close all
+% % close all
 
 end
 
-% 6. plot the normalize MSE
+%% 6. plot the normalize MSE
+
 mean(err)
 figure; hold on; grid on;
 plot(err,'LineStyle','none','Marker','x','Color','[0, 0, 0]','LineWidth',1.2);

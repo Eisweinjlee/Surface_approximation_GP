@@ -6,7 +6,9 @@ close all
 clear
 
 run('C:\Users\LI\Desktop\Approx_Surface\Local modeling project\excavator_data.m')
-load('nominal_modle_para.mat', 'kV')
+lambdaX = 2.302227968708186e+03; lambdaY = 1.631169900899356e+03;
+kV = 3.445999018892074; Xmove = 2.1830e-07; Ymove = 0.207118001857057;
+Sigma = [lambdaX,0;0,lambdaY];
 docName1 = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
 docName2 = "Approx_Surface\ErrorData training project\dataset_20191209_normalized\";
 
@@ -71,7 +73,7 @@ H_error = zeros(m,n,number);
 for i = 1:number
     Vol = 7.5889e+04;         % approx volume of full amount
     
-    delta_H = function_input_2d(X,Y,dep_center(i,:)',kV*Vol_data(i)*Vol,Sigma,the,xf,yr,yl);
+    delta_H = function_input_2d(X,Y,dep_center(i,:)-[Xmove,Ymove],kV*Vol_data(i)*Vol,Sigma,the,xf,yr,yl);
     H_error(:,:,i) = H_data(:,:,i) - delta_H;   % error data
     
 %         close all % test use (study about the error distribution!)
@@ -129,7 +131,7 @@ end
 % Because different data has different size of local area,
 % here let us make it sparse first.
 
-step_length = 5; % level of sparseness
+step_length = 15; % level of sparseness
 
 H_local_sparse = []; X_local_sparse = []; Y_local_sparse = [];
 

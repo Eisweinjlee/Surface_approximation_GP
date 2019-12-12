@@ -8,7 +8,7 @@ clear
 Mode_flag = 0; % 0: training & predict, 1: only predict
 
 %% load the dataset
-load local_dataset-10-Dec-2019.mat
+load local_dataset-12-Dec-2019.mat
 % X_data, Y_data, X, Y
 
 % test data
@@ -67,7 +67,7 @@ elseif Mode_flag == 1 % only predict
     %% Predict
     
     % load trained parameters
-    load("model-10-Dec-2019.mat")
+    load("model-11-Dec-2019.mat")
     
     for xx = [0.2 0.8]
         for yy = [-0.5 0.0 0.5]

@@ -76,6 +76,7 @@ parameters(:,i) = theta';
 %% result
 lambdaX = theta(1); lambdaY = theta(2); kV = theta(3);
 
+Sigma = [lambdaX,0; 0,lambdaY];
 ModelH = function_input_2d(X,Y,c,kV*V,Sigma,the,xf,yr,yl);
 
 % error_before
