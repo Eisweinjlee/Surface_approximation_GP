@@ -40,3 +40,6 @@ Titsias M. Variational learning of inducing variables in sparse Gaussian process
 </p>
 
 ### The error distribution model for soil loading
+<p float="center">
+<img width="900" src=https://user-images.githubusercontent.com/26374671/70691307-0df94e00-1cfc-11ea-9c5f-4109dff00b8a.png alt="Noisy data" />
+</p>
