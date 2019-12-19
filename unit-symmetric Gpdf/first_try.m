@@ -6,7 +6,7 @@ close all
 clear
 
 V = 10;
-alpha = 0.9;
+alpha = 0.8;
 lambdaX = 10; lambdaY = 10;
 x1pos = 0:0.1:5; x1neg = -5:0.1:0; x1neg(end)=[];
 x2pos = 0:0.1:5; x2neg = -5:0.1:0; x2neg(end)=[];
@@ -16,17 +16,20 @@ x2 = [x2neg,x2pos];
 Sneg = inv(sqrt(2*pi*lambdaX)) * exp(-0.5*inv(lambdaX)*(alpha/(2*alpha-1)*x1neg).^2);
 Spos = inv(sqrt(2*pi*lambdaX)) * exp(-0.5*inv(lambdaX)*(alpha*x1pos).^2);
 S = [Sneg,Spos];
-figure;plot([x1neg,x1pos],S)
+figure;plot([x1neg,x1pos],S);title("1D skewed distribution");grid on
 
 %% 2D situation
 [Xpos,Ypos] = meshgrid(x1pos,x2);
 [Xneg,Yneg] = meshgrid(x1neg,x2);
 Sigma = [lambdaX,0;0,lambdaY];
 
+% the nominal Gaussian pdf with skewness
 Hpos = V/(2*pi*det(Sigma)^0.5)*exp(-0.5*(inv(lambdaX)*(alpha*Xpos).^2 + ...
     inv(lambdaY)*Ypos.^2));
 Hneg = V/(2*pi*det(Sigma)^0.5)*exp(-0.5*(inv(lambdaX)*(alpha/(2*alpha-1)*Xneg).^2 + ...
     inv(lambdaY)*Yneg.^2));
+
+H_nowall = [Hneg,Hpos];
 
 % the wall effect
 xf = 5; yr = -5; yl = 5;
@@ -58,5 +61,7 @@ Hpos = Hpos + KK*exp(-0.5*(inv(lambdaX)*(alpha*(-(Xpos-(2*xf-0)))).^2 + ...
 
 H = [Hneg,Hpos];
 
+% plot
 X = [Xneg,Xpos]; Y = [Yneg,Ypos];
-figure;mesh(X,Y,H)
+figure;mesh(X,Y,H_nowall);title("without wall effect")
+figure;mesh(X,Y,H);title("wall effect added")
