@@ -20,9 +20,13 @@ updated on Dec 12th, 2019
 
 6. Doc. "beautiful Gp demo code" is coded for my presentation to show how GP works and how sparse approximation works.
 
+7. Doc. "Local modeling project" is a project to train a GP-based error distribution prediction model for soil loading of excavator.
+
 (On-going works)
 
-7. Doc. "Local modeling project" is a project to train a GP-based error distribution prediction model for soil loading of excavator.
+8. Doc. "PCA study" is a project to reduce dimension of the representation of soil shape data by applying Principal component analysis (PCA) method.
+
+9. Doc. "unit-symmetric Gpdf" is a project to use the skewed 2d Gaussian pdf to replace the nominal Gaussian pdf in our estimation.
 
 ### References:
 
