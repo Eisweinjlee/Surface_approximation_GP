@@ -140,7 +140,7 @@ ylabel("RMSE")
 grid on
 
 %% 5. PCA
-r = 4;  % is enough for our project to use r = 3
+r = 4;  % is enough for our project to use r = 4
 cbar = S*V';
 
 cbarre = cbar(1:r,:); % Principal component of each profile
@@ -160,3 +160,6 @@ H_approx = M_approx + vmean;
 %     rmse(i) = sqrt(immse(H_small(:,:,i),H_plot));
 % end
 % figure;plot(rmse)
+
+%% 6.save
+% save("M_matrix_PCA","M")
