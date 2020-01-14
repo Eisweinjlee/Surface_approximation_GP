@@ -1,4 +1,4 @@
-function [H_small_PC, H_small_mean] = PCA_pc(Xc,H)
+function pc_mean = PCA_pc(Xc,H,rank)
 %% Principal components calculation for the area around loading center.
 % The dataset is obtained to be M with PCA_dataset.m
 % Author: Yang Li
@@ -33,11 +33,13 @@ M = [M, v_bar];
 [U,S,V] = svd(M);
 
 %% 5. PC
-r = 4;  % is enough for our project to use r = 4
+r = rank;% is enough for our project to use r = 4
 cbar = S*V';
 
 % cbarre = cbar(1:r,:); % Principal component of each profile
 % Ure = U(:,1:r); % reduced weight matrix
 
 H_small_PC = cbar(1:r,end);
+
+pc_mean = [H_small_PC',H_small_mean];
 end

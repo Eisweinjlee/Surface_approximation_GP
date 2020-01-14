@@ -8,9 +8,16 @@ close all
 clear
 
 run('C:\Users\LI\Desktop\Approx_Surface\Local modeling project\excavator_data.m')
+
+% for function_input_2d
 lambdaX = 2.302227968708186e+03; lambdaY = 1.631169900899356e+03;
 kV = 3.445999018892074; Xmove = 2.1830e-07; Ymove = 0.207118001857057;
 Sigma = [lambdaX,0;0,lambdaY];
+
+% % for unit_sym_input_2d
+% lambdaX = 1.209827074460249e+03; lambdaY = 1.857790332589524e+03;
+% kV = 3.9410; Xmove = 0.0253; Ymove = 0.1487; alpha = 0.6147;
+
 docName1 = "Approx_Surface\ErrorData training project\dataset_20191108_normalized\";
 docName2 = "Approx_Surface\ErrorData training project\dataset_20191209_normalized\";
 docName3 = "Approx_Surface\ErrorData training project\dataset_20200108_normalized\";
@@ -187,6 +194,15 @@ for i = 1:9
     Vol_data = [Vol_data;0.25;0.50;0.50;0.75]; % docName2
 end
 Vol_data = [Vol_data; ones(128,1)]; % docName3
+
+%% 2.3 The shape before loading - PCA + mean
+rank = 4; % is enough to use r = 4 in our project
+pca_mean = zeros(number,rank+1);
+for i = 1:97
+    pca_mean(i,:) = PCA_pc([Xc(i);Yc(i)],H0,rank);
+end % docName1 & docName2
+
+%TODO: docName3
 
 %% 3. The error model
 
