@@ -1,4 +1,4 @@
-function pc_mean = PCA_pc(Xc,H,rank)
+function pc_mean = PCA_pc(Xc,H,rank,M_matrix)
 %% Principal components calculation for the area around loading center.
 % The dataset is obtained to be M with PCA_dataset.m
 % Author: Yang Li
@@ -14,7 +14,8 @@ function pc_mean = PCA_pc(Xc,H,rank)
 % Xc = [80;-20];
 
 %% 1. Load the PCA_dataset M
-load("Approx_Surface\PCA study\M_matrix_PCA.mat")
+M = M_matrix;
+% obtained from PCA_dataset.m
 
 %% 2. pick the small area around loading center
 depx = round(Xc(1)*100/170); depy = round((Xc(2)+80)*94/160);
