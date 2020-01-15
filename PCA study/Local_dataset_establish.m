@@ -65,88 +65,81 @@ load(docName3 + "00"); H02 = dep;
 % b10 ~ b61
 for i = 1:6
     filename = docName3 + "b" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "b" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % bb10 ~ bb81
 for i = 1:8
     filename = docName3 + "bb" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "bb" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % c10 ~ c91
 for i = 1:9
     filename = docName3 + "c" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "c" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % l10 ~ l61
 for i = 1:6
     filename = docName3 + "l" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "l" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % r10 ~ r61
 for i = 1:6
     filename = docName3 + "r" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "r" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % t10 ~ t61
 for i = 1:6
     filename = docName3 + "t" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "t" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % tt10 ~ tt81
 for i = 1:8
     filename = docName3 + "tt" + num2str(10*i)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + "tt" + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
 %     figure;subplot(1,2,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,2,2);mesh(H_data(:,:,number + 2))
     number = number + 2;
 end
-
 % 11 ~ 103
 for i = 1:10
     filename = docName3 + num2str(10*i+1)+".mat"; load(filename);
-    H_data(:,:,number + 1) = dep - H02;
+    H_data(:,:,number + 1) = dep;
     filename = docName3 + num2str(10*i+2)+".mat"; load(filename);
-    H_data(:,:,number + 2) = dep - H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = dep;
     filename = docName3 + num2str(10*i+3)+".mat"; load(filename);
-    H_data(:,:,number + 3) = dep - H_data(:,:,number + 2) - H02;
+    H_data(:,:,number + 3) = dep;
 %     figure;subplot(1,3,1);mesh(H_data(:,:,number + 1))
 %     subplot(1,3,2);mesh(H_data(:,:,number + 2))
 %     subplot(1,3,3);mesh(H_data(:,:,number + 3))
@@ -195,35 +188,124 @@ for i = 1:9
 end
 Vol_data = [Vol_data; ones(128,1)]; % docName3
 
-%% 2.3 The shape before loading - PCA + mean
+%% 2.3 The shape before loading - PCA + mean (Time-costing!!)
+disp("PCA starts");tic; 
 rank = 4; % is enough to use r = 4 in our project
+load('Approx_Surface\PCA study\M_matrix_PCA.mat')
+
 pca_mean = zeros(number,rank+1);
 for i = 1:97
-    pca_mean(i,:) = PCA_pc([Xc(i);Yc(i)],H0,rank);
+    pca_mean(i,:) = PCA_pc([Xc(i);Yc(i)],H0,rank,M);
 end % docName1 & docName2
 
-%TODO: docName3
+% docName3:b,bb,c,l,r,t,tt,1x~10x
+number = 97;
+for i = 1:6
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % b10 ~ b61
+for i = 1:8
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % bb10 ~ bb81
+for i = 1:9
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % c10 ~ c91
+for i = 1:6
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % l10 ~ l61
+for i = 1:6
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % r10 ~ r61
+for i = 1:6
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % t10 ~ t61
+for i = 1:8
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    number = number + 2;
+end % tt10 ~ tt81
+for i = 1:10
+    pca_mean(number+1,:) = PCA_pc([Xc(number+1);Yc(number+1)],H02,rank,M);
+    pca_mean(number+2,:) = PCA_pc([Xc(number+2);Yc(number+2)],H_data(:,:,number+1),rank,M);
+    pca_mean(number+3,:) = PCA_pc([Xc(number+3);Yc(number+3)],H_data(:,:,number+2),rank,M);
+    number = number + 3;
+end % 11 ~ 103
+toc
 
-%% 3. The error model
+%% 3.1 The transition for 2nd & 3rd loading (for docName3)
+number = 97;
+for i = 1:6
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 2;
+end % b10 ~ b61
+for i = 1:8
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 2;
+end % bb10 ~ bb81
+for i = 1:9
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 2;
+end % c10 ~ c91
+for i = 1:6
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 2;
+end % l10 ~ l61
+for i = 1:6
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 2;
+end % r10 ~ r61
+for i = 1:6
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 2;
+end % t10 ~ t61
+for i = 1:8
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H02 - H_data(:,:,number + 1);
+    number = number + 2;
+end % tt10 ~ tt81
+for i = 1:10
+    H_data(:,:,number + 3) = H_data(:,:,number + 3) - H_data(:,:,number + 2);
+    H_data(:,:,number + 2) = H_data(:,:,number + 2) - H_data(:,:,number + 1);
+    H_data(:,:,number + 1) = H_data(:,:,number + 1) - H02;
+    number = number + 3;
+end % 11 ~ 103
+
+%% 3.2 The error model
 
 % the center, volume -> error data
-dep_center = [Xc,Yc]; Vol = zeros(number,1);
+dep_center = [Xc,Yc];
+Vol = 7.5889e+04; % approx volume of full amount
+
 H_error = zeros(m,n,number);
 for i = 1:number
-    Vol = 7.5889e+04;         % approx volume of full amount
-    
     delta_H = function_input_2d(X,Y,dep_center(i,:)-[Xmove,Ymove],kV*Vol_data(i)*Vol,Sigma,the,xf,yr,yl);
 %     delta_H = unit_sym_input_2d(X,Y,dep_center(i,:)-[Xmove,Ymove],kV*Vol_data(i)*Vol,Sigma,alpha);
     H_error(:,:,i) = H_data(:,:,i) - delta_H;   % error data
     
-%         close all % test use (study about the error distribution!)
-%         figure
-%         mesh(delta_H)
-%         title("Gaussian pdf")
-%         figure
-%         mesh(H_error(:,:,i))
-%         title("Error Model")
-    
+%     close all % test use (study about the error distribution!)
+%     figure
+%     mesh(delta_H)
+%     title("Gaussian pdf")
+%     figure
+%     mesh(H_error(:,:,i))
+%     title("Error Model")
 end
 
 %% 4.1 Determine the local area for each data
@@ -233,8 +315,8 @@ end
 % Y_local(m,n,number) - the data of Y, outside local area is all 0.
 
 % Parameters
-ux = 70; uy = 60;   % area upper bound to center
-lx = 70; ly = 60;   % area lower bound to center
+ux = 70; uy = 70;   % area upper bound to center
+lx = 70; ly = 70;   % area lower bound to center
 
 % Get the area of local space
 X_range = [Xc-lx, Xc+ux]; Y_range = [Yc-ly, Yc+uy];
@@ -271,7 +353,7 @@ end
 % Because different data has different size of local area,
 % here let us make it sparse first.
 
-step_length = 15; % level of sparseness
+step_length = 13; % level of sparseness
 
 H_local_sparse = []; X_local_sparse = []; Y_local_sparse = [];
 
@@ -289,7 +371,7 @@ end
 
 %% 6. Plot to check the local area and data
 % num = 8; % the data number: 1~61 62~97 98~225
-for num = [150 175 200]
+for num = [123 124 125 220 221 222]
 
 % Evaluation: plot H_local to see whether your local area covers well!!
 figure; mesh(H_error(:,:,num)); figure; mesh(H_local(:,:,num));
@@ -327,7 +409,6 @@ X_data = [];
 Y_data = [];
 
 for k = 1:number
-    
     % get rid of the 0 elements in H_local_sparse, X_local_sparse, Y_local_sparse
     XX = X_local_sparse(:,:,k);
     YY = Y_local_sparse(:,:,k);
@@ -352,19 +433,28 @@ for k = 1:number
     % Volume
     Vol_nor = Vol_data(k) * ones(length(Xre),1);
     
+    % the PCs & mean value of loading area
+    pca_mean_nor = [pca_mean(k,1:rank)/800, pca_mean(k,rank+1)/40];
+    % PCs: 758.0602, mean: 37.6060
+    pca_mean_nor = ones(length(Xre),1) * pca_mean_nor;
+    
     % save the data to dataset vector
     Y_data = [Y_data; HH(:)];
-    X_data = [X_data; Xc_nor, Yc_nor, Xre, Yre, Vol_nor];
+    X_data = [X_data; Xc_nor, Yc_nor, Xre, Yre, Vol_nor, pca_mean_nor];
 end
 
 disp("The input data is N = " + length(X_data(:,1)) + " with D = " + length(X_data(1,:)))
 
 % X_test
+pca_mean_vec = PCA_pc([85,0],H0,4,M);
+pca_mean_vec = ones(9400,1)*[pca_mean_vec(1:rank)/800, pca_mean_vec(rank+1)/40];
 X_test = [0.5*ones(9400,1), zeros(9400,1), (X(:)-85)/170, Y(:)/80,...
-    1.0*ones(9400,1)];
+    1.0*ones(9400,1),pca_mean_vec];
 
 H0 = initializeH_2d(X,xc,xr,thr,thf);
 
-% filename = "local_dataset-"+ date +".mat";
-% save(filename,'X_data','Y_data', 'X', 'Y', 'H0')
-% disp("The data is saved as "+ filename)
+filename = "local_dataset-"+ date +".mat";
+save(filename,'X_data','Y_data', 'X', 'Y', 'H0')
+disp("The data is saved as "+ filename)
+
+save("pca_mean","pca_mean") % save the pca_mean for Local_dataset_GP_evaluation.m
